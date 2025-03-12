@@ -3,7 +3,8 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 
 # Initialisiere Dash mit Unterstützung für Multi-Pages
-app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])  # Removed use_pages
+
 server = app.server
 
 # Kategorien mit URLs
