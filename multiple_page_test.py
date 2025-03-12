@@ -1,72 +1,21 @@
 import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+import os
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Initialize Dash app with Bootstrap
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 server = app.server
+
+# Importing page layouts (this will include your different graph pages)
+from graphs import gesamt_export_import_volumen
 
 # Kategorien und Subkategorien mit Links für zukünftige Navigation
 def create_nav_structure():
     return {
         "Überblick über Deutschlands Handel": {
             "Gesamtüberblick seit 2008 bis 2024": {
-                "Gesamter Export-, Import- und Handelsvolumen-Verlauf Deutschlands": "#"
-            },
-            "Überblick nach bestimmtem Jahr": {
-                "Monatlicher Handelsverlauf": "#",
-                "Top 10 Handelspartner": "#",
-                "Länder mit größten Export- und Importzuwächsen (absolut)": "#",
-                "Länder mit größten Export- und Importzuwächsen (relativ)": "#",
-                "Top 10 Waren": "#",
-                "Waren mit größten Export- und Importzuwächsen (absolut)": "#",
-                "Waren mit größten Export- und Importzuwächsen (relativ)": "#"
-            }
-        },
-        "Länderanalyse": {
-            "Gesamtüberblick seit 2008 bis 2024": {
-                "Gesamter Export-, Import- und Handelsvolumen-Verlauf mit Deutschland": "#",
-                "Vergleich mit anderen Ländern": "#",
-                "Export- und Importwachstumsrate": "#",
-                "Platzierung im Export- und Importranking Deutschlands": "#",
-                "Deutschlands Top 10 Waren im Handel": "#"
-            },
-            "Überblick nach bestimmtem Jahr": {
-                "Handelsbilanz & Ranking": "#",
-                "Monatlicher Handelsverlauf": "#",
-                "Top 10 Export- und Importwaren": "#",
-                "Top 4 Waren nach Differenz zum Vorjahr": "#",
-                "Top 4 Waren nach Wachstum zum Vorjahr": "#"
-            },
-            "Überblick nach bestimmter Ware": {
-                "Gesamter Export- und Importverlauf der Ware mit Deutschland": "#"
-            },
-            "Überblick nach bestimmtem Jahr und Ware": {
-                "Monatlicher Verlauf von Export- und Importwerten für die angegebene Ware im Jahr": "#"
-            },
-            "Überblick nach bestimmtem Zeitraum und Waren": {
-                "Export- und Importverlauf (jährlich) bestimmter Waren für ein bestimmtes Land": "#",
-                "Export- und Importverlauf (jährlich) einer bestimmten Ware für bestimmte Länder": "#"
-            }
-        },
-        "Warenanalyse": {
-            "Gesamtüberblick seit 2008 bis 2024": {
-                "Gesamter Export- und Importverlauf der Ware": "#",
-                "Deutschlands Top 5 Export- und Importländer der Ware": "#"
-            },
-            "Überblick mit mehreren Waren über bestimmten Zeitraum": {
-                "Gesamter Export- und Importverlauf der Waren (jährliche Werte)": "#",
-                "Gesamter Export- und Importverlauf der Waren (monatliche Werte)": "#"
-            },
-            "Überblick nach bestimmtem Jahr": {
-                "Ranking der Ware im Vergleich zu anderen Waren": "#",
-                "Monatlicher Export- und Importvolumen-Verlauf der Ware": "#"
-            },
-            "Überblick nach bestimmtem Land": {
-                "Gesamter Export- und Importverlauf der Ware von bzw. nach Deutschland": "#"
-            },
-            "Überblick nach bestimmtem Zeitraum und Land und Waren": {
-                "Export- und Importverlauf (jährlich) mehrerer Waren für ein bestimmtes Land": "#",
-                "Export- und Importverlauf (jährlich) einer bestimmten Ware für bestimmte Länder": "#"
+                "Gesamter Export-, Import- und Handelsvolumen-Verlauf Deutschlands": "/gesamt_export_import_volumen"
             }
         }
     }
@@ -106,14 +55,29 @@ sidebar = html.Div([
     render_sidebar(categories)
 ], className="sidebar")
 
+# Define the main layout
 app.layout = html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col(sidebar, width=3),
-            dbc.Col(html.Div("Inhalt des Dashboards"), width=9)
+            dbc.Col(
+                html.Div(id='page-content'), 
+                width=9
+            )
         ])
     ])
 ])
+
+# Callback to switch between pages
+@app.callback(
+    dash.Output('page-content', 'children'),
+    [dash.Input('url', 'pathname')]
+)
+def display_page(pathname):
+    if pathname == "/gesamt_export_import_volumen":
+        return gesamt_export_import_volumen.layout
+    else:
+        return html.H3("Bitte wählen Sie eine Kategorie aus der Sidebar.")
 
 if __name__ == "__main__":
     app.run_server(debug=True)
