@@ -9,7 +9,7 @@ import os
 csv_path = os.path.join(os.path.dirname(__file__), '../data/aggregated_df.csv')
 aggregated_df = pd.read_csv(csv_path)
 
-# Funktion zum Formatieren der x-Achse (Euro-Werte) ohne Komma
+# Funktion zum Formatieren der x-Achse (Euro-Werte)
 def formatter(value):
     if value >= 1e9:
         return f'{int(value * 1e-9)} Mrd'
@@ -25,22 +25,22 @@ def create_layout():
     return html.Div([
         html.H1("Top 10 Export- und Importprodukte nach Jahr"),
         dcc.Dropdown(
-            id='jahr_dropdown',
+            id='jahr_dropdown_top_10_trade_goods',
             options=[{'label': str(j), 'value': j} for j in sorted(aggregated_df['Jahr'].unique())],
             value=2024,
             clearable=False,
             style={'width': '50%'}
         ),
-        dcc.Graph(id='export_graph'),
-        dcc.Graph(id='import_graph'),
+        dcc.Graph(id='export_graph_top_10_trade_goods'),
+        dcc.Graph(id='import_graph_top_10_trade_goods'),
     ])
 
 # Callback-Funktion registrieren
 def register_callbacks(app):
     @app.callback(
-        [Output('export_graph', 'figure'),
-         Output('import_graph', 'figure')],
-        Input('jahr_dropdown', 'value')
+        [Output('export_graph_top_10_trade_goods', 'figure'),
+         Output('import_graph_top_10_trade_goods', 'figure')],
+        Input('jahr_dropdown_top_10_trade_goods', 'value')
     )
     def update_graphs(selected_year):
         filtered_df = aggregated_df[aggregated_df['Jahr'] == selected_year]
@@ -51,10 +51,6 @@ def register_callbacks(app):
         aggregated_year_df['Handelsvolumen'] = aggregated_year_df['Ausfuhr: Wert'] + aggregated_year_df['Einfuhr: Wert']
         top_10_exports = aggregated_year_df.sort_values(by='Ausfuhr: Wert', ascending=False).head(10)
         top_10_imports = aggregated_year_df.sort_values(by='Einfuhr: Wert', ascending=False).head(10)
-
-        max_value = max(top_10_exports['Ausfuhr: Wert'].max(), top_10_imports['Einfuhr: Wert'].max())
-        tick_max = np.ceil(max_value / 2e10) * 2e10
-        tick_vals = np.arange(0, tick_max + 1, 2e10)
 
         export_fig = go.Figure()
         export_fig.add_trace(go.Bar(
@@ -67,8 +63,7 @@ def register_callbacks(app):
         export_fig.update_layout(
             title=f"Top 10 Exportprodukte im Jahr {selected_year}",
             xaxis_title="Exportwert (Euro)",
-            yaxis_title="Warenkategorie",
-            xaxis=dict(tickmode='array', tickvals=tick_vals, ticktext=[formatter(val) for val in tick_vals]),
+            yaxis_title="Warenkategorie"
         )
 
         import_fig = go.Figure()
@@ -82,8 +77,7 @@ def register_callbacks(app):
         import_fig.update_layout(
             title=f"Top 10 Importprodukte im Jahr {selected_year}",
             xaxis_title="Importwert (Euro)",
-            yaxis_title="Warenkategorie",
-            xaxis=dict(tickmode='array', tickvals=tick_vals, ticktext=[formatter(val) for val in tick_vals]),
+            yaxis_title="Warenkategorie"
         )
 
         return export_fig, import_fig
