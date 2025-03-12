@@ -88,9 +88,9 @@ def render_graph(pathname):
         if hasattr(graph_module, 'create_layout'):
             return graph_module.create_layout()
         else:
-            return f"Graph {graph_name} does not have a create_layout() function", 404
+            return html.Div(f"Graph {graph_name} does not have a create_layout() function"), 404
     except ModuleNotFoundError:
-        return f"Graph {graph_name} not found", 404
+        return html.Div(f"Graph {graph_name} not found"), 404
 
 # Register Callbacks only for modules that have register_callbacks function
 graph_modules = [
