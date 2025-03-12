@@ -1,13 +1,12 @@
 import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-import graphs.gesamt_export_import_volumen  # Importiere die Seite
 
 # Initialisiere Dash mit Unterstützung für Multi-Pages
 app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
-# Kategorien mit URLs aktualisieren
+# Kategorien mit URLs
 categories = {
     "Overview of Germany's trade": {
         "Total overview since 2008 to 2024": {
@@ -53,6 +52,9 @@ app.layout = html.Div([
         ])
     ])
 ])
+
+# Nach App-Initialisierung: Import der Seiten (um Reihenfolge sicherzustellen)
+import graphs.gesamt_export_import_volumen  # <-- Jetzt erst importieren
 
 if __name__ == "__main__":
     app.run_server(debug=True)
