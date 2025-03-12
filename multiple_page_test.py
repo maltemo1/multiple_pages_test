@@ -66,20 +66,36 @@ app.layout = html.Div([
     dbc.Container([
         dbc.Row([
             dbc.Col(sidebar, width=3),
-            dbc.Col(html.Div("Inhalt des Dashboards"), width=9)
+            dbc.Col(html.Div(id="page-content"), width=9)
         ])
     ])
 ])
 
-# Dynamically import graph files
-@app.server.route('/<graph_name>')
-def render_graph(graph_name):
+# Dynamically import graph files and render the content
+@app.callback(
+    dash.dependencies.Output('page-content', 'children'),
+    [dash.dependencies.Input('url', 'pathname')]
+)
+def render_graph(pathname):
+    # Remove the leading '/' from the pathname
+    graph_name = pathname.lstrip('/')
     try:
         # Dynamically import the graph module
         graph_module = importlib.import_module(f'graphs.{graph_name}')
         return graph_module.create_layout()
     except ModuleNotFoundError:
         return f"Graph {graph_name} not found", 404
+
+# Add dcc.Location to allow URL navigation
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),  # Added dcc.Location to track URL
+    dbc.Container([
+        dbc.Row([
+            dbc.Col(sidebar, width=3),
+            dbc.Col(html.Div(id="page-content"), width=9)
+        ])
+    ])
+])
 
 if __name__ == "__main__":
     app.run_server(debug=True)
