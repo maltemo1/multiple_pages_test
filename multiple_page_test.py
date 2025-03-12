@@ -5,18 +5,6 @@ import importlib
 import os
 import glob
 
-# Registriere Callbacks für alle Graph-Module, die eine register_callbacks-Funktion haben
-graph_modules = ['monthly_trade']  # Liste aller Graphen, die Callbacks haben
-
-for module_name in graph_modules:
-    try:
-        module = importlib.import_module(f'graphs.{module_name}')
-        if hasattr(module, 'register_callbacks'):
-            module.register_callbacks(app)
-    except ModuleNotFoundError:
-        print(f"Module {module_name} not found.")
-
-
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
 
@@ -97,6 +85,17 @@ def render_graph(pathname):
         return graph_module.create_layout()
     except ModuleNotFoundError:
         return f"Graph {graph_name} not found", 404
+
+# Registriere Callbacks für alle Graph-Module, die eine register_callbacks-Funktion haben
+graph_modules = ['monthly_trade']  # Liste aller Graphen, die Callbacks haben
+
+for module_name in graph_modules:
+    try:
+        module = importlib.import_module(f'graphs.{module_name}')
+        if hasattr(module, 'register_callbacks'):
+            module.register_callbacks(app)
+    except ModuleNotFoundError:
+        print(f"Module {module_name} not found.")
 
 # Add dcc.Location to allow URL navigation
 app.layout = html.Div([
