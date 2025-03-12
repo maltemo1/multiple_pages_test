@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 
+# `register_page` erst nach der Haupt-App-Instanz aufrufen!
 dash.register_page(__name__, path="/gesamt_export_import_volumen")
 
 # CSV-Datei einlesen
