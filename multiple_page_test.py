@@ -3,7 +3,6 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 import importlib
 import os
-import glob
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -68,6 +67,7 @@ sidebar = html.Div([
 ], className="sidebar")
 
 app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),  # URL Tracker
     dbc.Container([
         dbc.Row([
             dbc.Col(sidebar, width=3),
@@ -82,17 +82,21 @@ app.layout = html.Div([
     [dash.dependencies.Input('url', 'pathname')]
 )
 def render_graph(pathname):
-    # Remove the leading '/' from the pathname
     graph_name = pathname.lstrip('/')
     try:
-        # Dynamically import the graph module
         graph_module = importlib.import_module(f'graphs.{graph_name}')
-        return graph_module.create_layout()
+        if hasattr(graph_module, 'create_layout'):
+            return graph_module.create_layout()
+        else:
+            return f"Graph {graph_name} does not have a create_layout() function", 404
     except ModuleNotFoundError:
         return f"Graph {graph_name} not found", 404
 
-# Registriere Callbacks für alle Graph-Module, die eine register_callbacks-Funktion haben
-graph_modules = ['monthly_trade', 'top_10_trade_partners', 'top_diff_countries', 'top_growth_countries', 'top_diff_goods', 'top_growth_goods', 'top_10_trade_goods']  # Liste aller Graphen, die Callbacks haben
+# Register Callbacks only for modules that have register_callbacks function
+graph_modules = [
+    'monthly_trade', 'top_10_trade_partners', 'top_diff_countries', 
+    'top_growth_countries', 'top_diff_goods', 'top_growth_goods', 'top_10_trade_goods'
+]
 
 for module_name in graph_modules:
     try:
@@ -101,17 +105,6 @@ for module_name in graph_modules:
             module.register_callbacks(app)
     except ModuleNotFoundError:
         print(f"Module {module_name} not found.")
-
-# Add dcc.Location to allow URL navigation
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),  # Added dcc.Location to track URL
-    dbc.Container([
-        dbc.Row([
-            dbc.Col(sidebar, width=3),
-            dbc.Col(html.Div(id="page-content"), width=9)
-        ])
-    ])
-])
 
 if __name__ == "__main__":
     app.run_server(debug=True)
