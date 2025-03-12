@@ -17,7 +17,12 @@ def create_nav_structure():
             },
             "Überblick nach bestimmtem Jahr": {
                 "Monatlicher Handelsverlauf": "monthly_trade",
-                "Top 10 Handelspartner": "top_10_trade_partners"
+                "Top 10 Handelspartner": "top_10_trade_partners",
+                "Länder mit größten Export- und Importzuwächsen (absolut)": "top_diff_countries",
+                "Länder mit größten Export- und Importzuwächsen (relativ)": "top_growth_countries",
+                "Top 10 Waren": "top_10_trade_goods",
+                "Waren mit größten Export- und Importzuwächsen (absolut)": "top_diff_goods",
+                "Waren mit größten Export- und Importzuwächsen (relativ)": "top_growth_goods"
             }
         },
         "Länderanalyse": {
