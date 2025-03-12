@@ -87,7 +87,7 @@ def render_graph(pathname):
         return f"Graph {graph_name} not found", 404
 
 # Registriere Callbacks für alle Graph-Module, die eine register_callbacks-Funktion haben
-graph_modules = ['monthly_trade']  # Liste aller Graphen, die Callbacks haben
+graph_modules = ['monthly_trade', 'top_10_trade_partners']  # Liste aller Graphen, die Callbacks haben
 
 for module_name in graph_modules:
     try:
