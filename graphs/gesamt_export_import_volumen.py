@@ -38,7 +38,7 @@ import os
 """
 
 # CSV-Datei einlesen
-df_gesamt_deutschland = pd.read_csv('/content/drive/MyDrive/DIIHK/Data/Render_Data_Sets/1gesamt_deutschland.csv')
+df_gesamt_deutschland = pd.read_csv('data/1gesamt_deutschland.csv')
 
 # Dash-App erstellen
 app = dash.Dash(__name__)
